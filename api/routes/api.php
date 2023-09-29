@@ -20,5 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/tareas/create', [TareasController::class, 'CrearTarea']);
+Route::post('/tarea/edit', [TareasController::class, 'EditarTarea']);
 Route::post('/tarea/{d}', [TareasController::class, 'ListarUnaTarea']);
 Route::post('/tareas', [TareasController::class, 'Listar']);
