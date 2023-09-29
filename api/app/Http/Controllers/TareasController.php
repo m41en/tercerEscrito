@@ -79,6 +79,11 @@ class TareasController extends Controller
         }
     }
 
+    public function EliminarTarea($id_tarea) {
+        $tareaEliminar = tareas::findOrFail($id_tarea);
+        $tareaEliminar -> delete();
+    }
+
     private function Listar($id_tarea) {
         return tareas::all();
     }
