@@ -31,4 +31,12 @@ class TareasController extends Controller
             
         return $nuevaTarea;
     }
+
+    private function Listar($id_tarea) {
+        return tareas::all();
+    }
+
+    private function ListarUnaTarea($id_tarea) {
+        return tareas::find($id_tarea);
+    }
 }
