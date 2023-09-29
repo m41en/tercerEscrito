@@ -53,15 +53,24 @@ class TareasController extends Controller
     }
 
     public function Editar(request $request) {
-        $id_tarea = $request->input('id');
-        $tarea = $this->ListarUnaTarea($id_tarea);
-        $tarea -> titulo = $request->input('titulo');
-        $tarea -> contenido = $request->input('contenido');
-        $tarea -> estado = $request->input('estado');
-        $tarea -> autor = $request->input('autor');  
-        $tarea -> save();  
-        return $tarea;
+        try {
+            DB::raw('LOCK TABLE tareas WRITE');
+            DB::beginTransaction();
 
+            $tarea = tareas::findOrFail($request->post("id"));
+            $tarea -> titulo = $request->post('titulo');
+            $tarea -> contenido = $request->post('contenido');
+            $tarea -> estado = $request->post('estado');
+            $tarea -> autor = $request->post('autor');
+            $tarea->save();
+
+            return response()->json([$tarea], 201);
+        } catch (\Illuminate\Database\QueryException $th) {
+            DB::rollback();
+            return $th->getMessage();
+        } catch (\PDOException $th) {
+            return response("Permiso a la BD denegado",403);
+        }
     }
 
     private function Listar($id_tarea) {
