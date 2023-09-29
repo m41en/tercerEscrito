@@ -22,14 +22,26 @@ class TareasController extends Controller
     }
 
     private function GuardarTarea(Request $request) {
-        $nuevaTarea = new tareas();
-        $nuevaTarea -> titulo = $request->input('titulo');
-        $nuevaTarea -> contenido = $request->input('contenido');
-        $nuevaTarea -> estado = $request->input('estado');
-        $nuevaTarea -> autor = $request->input('autor');
-        $nuevaTarea -> save();
-            
-        return $nuevaTarea;
+        try {
+            DB::raw('LOCK TABLE tareas WRITE');
+            DB::beginTransaction();
+    
+            $nuevaTarea = new tareas();
+            $nuevaTarea -> titulo = $request->post('titulo');
+            $nuevaTarea -> contenido = $request->post('contenido');
+            $nuevaTarea -> estado = $request->post('estado');
+            $nuevaTarea -> autor = $request->post('autor');
+            $nuevaTarea->save();
+    
+            return response()->json([$nuevaTarea], 201);
+            DB::commit();
+            DB::raw('UNLOCK TABLES');
+        } catch (\Illuminate\Database\QueryException $th) {
+            DB::rollback();
+            return $th->getMessage();
+        } catch (\PDOException $th) {
+            return response("Permiso a la BD denegado",403);
+        }
     }
 
     public function EditarTarea(Request $request) {
