@@ -33,23 +33,17 @@ class TareasController extends Controller
     }
 
     public function EditarTarea(Request $request) {
-        $validacion = self::EditarValidacion($request);
-
-        if ($validacion->fails()) {
-            return $validacion->errors();
-        }
-        
-        return $this -> Editar($request);
-    }
-
-    public function EditarValidacion(Request $request) {
         $validator = Validator::make($request->all(),[
             'titulo' => 'required | string',
             'contenido' => 'required | string',
             'estado' => 'nullable | string',
             'autor' => 'nullable | string'
         ]);
-        return $validator;    
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        return $this -> Editar($request);
     }
 
     public function Editar(request $request) {
